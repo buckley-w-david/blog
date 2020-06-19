@@ -1,0 +1,22 @@
+baseURL: "https://davidbuckley.ca"
+languageCode: "en-us"
+title: "David Buckley"
+theme: "cupper"
+params:
+  email: "david@davidbuckley.ca"
+
+
+menu:
+  nav:
+    - name: Home
+      url: /
+      weight: 1
+    - name: Blog
+      url: /post/
+      weight: 2
+    - name: About
+      url: /about/
+      weight: 4
+    - name: RSS
+      url: /index.xml
+      weight: 5
