@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Blog on David Buckley</title>
+    <link>https://davidbuckley.ca/post/</link>
+    <description>Recent content in Blog on David Buckley</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 19 Jun 2020 12:40:05 -0400</lastBuildDate>
+    
+	<atom:link href="https://davidbuckley.ca/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>String Interpolation and SQL</title>
+      <link>https://davidbuckley.ca/post/string-interpolation-and-sql/</link>
+      <pubDate>Fri, 19 Jun 2020 19:52:43 -0400</pubDate>
+      
+      <guid>https://davidbuckley.ca/post/string-interpolation-and-sql/</guid>
+      <description>Background SQL injection sucks, right? I&amp;rsquo;m not going to talk about it too much because firstly you already know, and secondly you can go somewhere else for a much better explanation.
+# This is vulnerable to an SQL injection attack cursor.execute(f&amp;quot;SELECT * FROM users WHERE id = {id}&amp;quot;) # This is not, but it is much less natural cursor.execute(&amp;quot;SELECT * FROM users WHERE id = ?&amp;quot;, id) What I am going to talk about though is a neat idea I had after noticing a set of functions in EF Core: ExecuteSqlInterpolated and FromSqlInterpolated.</description>
+    </item>
+    
+    <item>
+      <title>Hello World</title>
+      <link>https://davidbuckley.ca/post/hello-world/</link>
+      <pubDate>Fri, 19 Jun 2020 11:05:12 -0400</pubDate>
+      
+      <guid>https://davidbuckley.ca/post/hello-world/</guid>
+      <description>This is the first blog post&amp;hellip; yay!
+For a while I&amp;rsquo;ve had the ambition that I should try my hand at writing a blog, so this is me finally getting around to it.
+I don&amp;rsquo;t expect to update often, but who knows.</description>
+    </item>
+    
+  </channel>
+</rss>
