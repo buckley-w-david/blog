@@ -133,7 +133,7 @@ The upside though is that it does work!
 >>> y = 2
 >>> z = 3
 >>> print(f('''INSERT INTO users (col1, col2, col3) VALUES ({x+1}, {y+2}, {z+3})'''))
-('INSERT INTO users (col1, col2, col3) VALUES (?, ?, ?)', [2, 4, 6])```
+('INSERT INTO users (col1, col2, col3) VALUES (?, ?, ?)', [2, 4, 6])
 >>> def do_something(value):
 ...     return value*5
 ... 
