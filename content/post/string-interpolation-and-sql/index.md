@@ -134,21 +134,11 @@ The upside though is that it does work!
 >>> z = 3
 >>> print(f('''INSERT INTO users (col1, col2, col3) VALUES ({x+1}, {y+2}, {z+3})'''))
 ('INSERT INTO users (col1, col2, col3) VALUES (?, ?, ?)', [2, 4, 6])```
-```
-
-...mostly
-
-```
->>> def do_something_compilicated(value):
+>>> def do_something(value):
 ...     return value*5
 ... 
->>> print(f('''INSERT INTO users (col1, col2, col3) VALUES ({do_something_complicated(x)}, {y+2}, {z+3})'''))
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-  File "/home/david/Projects/parameterized-interpolated-sql-queries/interpolate.py", line 45, in parameterize_interpolated_querystring_spicy
-    exec(compile(assign, '<string>', 'exec'), globals(), outer_frame.frame.f_locals)
-  File "<string>", line 1, in <module>
-NameError: name 'do_something_complicated' is not defined
+>>> print(f('''INSERT INTO users (col1, col2, col3) VALUES ({do_something(x+7)}, {y+2}, {z+3})'''))
+('INSERT INTO users (col1, col2, col3) VALUES (?, ?, ?)', [40, 4, 6])
 ```
 
 ## Conclusion
