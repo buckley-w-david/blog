@@ -4,7 +4,14 @@ title: "David Buckley"
 theme: "cupper"
 params:
   email: "david@davidbuckley.ca"
+  customCss:
+    - css/code.css # relative path starting from static/
+    - css/general.css # relative path starting from static/
 
+markup:
+  defaultMarkdownHandler: goldmark
+  goldmark:
+      unsafe: true
 
 menu:
   nav:
