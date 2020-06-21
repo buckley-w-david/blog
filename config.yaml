@@ -9,8 +9,8 @@ params:
     - css/general.css # relative path starting from static/
 
 markup:
-  defaultMarkdownHandler: goldmark
   goldmark:
+    renderer:
       unsafe: true
 
 menu:

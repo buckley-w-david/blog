@@ -46,7 +46,7 @@ The [ inspect ](https://docs.python.org/3/library/inspect.html) and [ ast ](http
 
 Without further ado, I introduce... [ interpolate.py ](https://github.com/buckley-w-david/parameterized-interpolated-sql-queries/blob/master/interpolate.py)!
 
-`interpolate.py` contains two functions, one horrible, the other even worse.
+`interpolate.py` contains a single, extremely cursed, function.
 
 ## `parameterize_interpolated_querystring`
 
@@ -60,7 +60,7 @@ id = 5
 cursor.execute(f"SELECT * FROM users WHERE id = {id}") 
 ```
 
-You could instead do this
+You could instead do this:
 ```
 import interpolate
 id = 5
@@ -68,7 +68,7 @@ f = interpolate.paramaterize_interpolated_querystring
 cursor.execute(*f("SELECT * FROM users WHERE id = {id}")) 
 ```
 
-Which will auto-magically be transformed into
+Which will auto-magically be transformed into:
 
 ```
 cursor.execute("SELECT * FROM users WHERE id = ?", [5])
@@ -76,55 +76,62 @@ cursor.execute("SELECT * FROM users WHERE id = ?", [5])
 
 ### How does it work?
 
-Most of the magic is in these lines
+Most of the magic is in these lines:
 
 ```
-frame = inspect.currentframe()
-outer_frame = inspect.getouterframes(frame)[1]
-possible_query_values = {**globals(), **outer_frame.frame.f_locals}
-```
-
-This takes advantage of the `inspect` module to reach up into the callers stack frame and retrieve their local variables. This is what allows us to return the list of parameter values using the variable names within the interpolation.
-
-Taking advantage of the `ast` module then allows us to do the f-string parsing (The same way that python itself does it), and replace all instances of interpolation with a placeholder (`?` by default, but the function accepts this as an argument), resulting in the parameterized query string.
-
-## `parameterize_interpolated_querystring_spicy`
-
-This function is `parameterize_interpolated_querystring` cursed twin. Generally it does the same thing, except it is more powerful and far more dangerous.
-
-You may have noticed while reading about `parameterize_interpolated_querystring` that the method I described will actually only work for interpolation like `f"value: {x}"` and fail when trying to do something like `f"value: {x+1}"`. 
-
-This is probably fine, it seems somewhat unnecessary and dangerous to allow arbitrary expressions.
-
-However it was a hole in functionality, and `parameterize_interpolated_querystring_spicy` is the solution to fill it.
-
-Generally the approach is similar, use `inspect` and `ast` to get what values you need and return a parameterized version of the query. The difference is that instead of just using whatever was in the interpolation to look up the variables value, we use the `compile` and `exec` build-in functions along with some more ast manipulation to actually evaluate whatever was in there.
-
-The gist of how that's done is here:
-
-```
-...
-tree = ast.parse(f"f'{query}'")
+tree = ast.fix_missing_locations(ast.parse(f'f{json.dumps(query)}'))
 values = tree.body[0].value.values
-temp_name = '__paramaterize_interpolated_querystring_spicy_temp'
-assign = ast.parse(f'{temp_name} = 0')
 
-for node in values:
-	...
-		# This may be the most cursed code I have ever written
-		assign.body[0].value = node.value
-		assign = ast.fix_missing_locations(assign)
-		exec(compile(assign, '<string>', 'exec'), globals(), outer_frame.frame.f_locals)
+frame = inspect.currentframe()
+outer_frame = inspect.getouterframes(frame)[1] # element 1 is the parent stack frame
 
-		query_values.append(outer_frame.frame.f_locals[temp_name])
-	...
+outer_locals = outer_frame.frame.f_locals.copy()
 ```
 
-Using the `ast` module I build an assignment statement for the value to interpolate, `compile` and `exec` it, and then retrieve it from the outer stack frames locals.
+This takes advantage of the `inspect` module to reach up into the callers stack frame and retrieve their local variables. This is what allows us to later use these values as part of the call to resolve the interpolation. The `dict` of locals is copied instead of used directly so that we can add to it without polluting the parent namespace.
 
-I would have much preferred not having to pollute the outer stack frame with a variable, but I could not figure out any other technique to accomplish the same feat and retrieve the value. This could very well just be my ignorance.
+By using `ast.parse`, the string is parsed as an f-string the same way that python itself does it. `json.dumps` is used for quote escaping so that the code isn't *itself* vulnerable to an injection attack. 
 
-The upside though is that it does work!
+<div class="disclaimer">
+<p> This is the main reason you shouldn't actually do this, because while I have thought about the issue and attempted to get around it, there are no guarantees that an attacker would not be able to find a way to inject code in such a way that it's run by the python interpreter.</p>
+</div>
+
+Once all that bookkeeping is done, we can move on to building the return.
+
+```
+temp_name = '__parameterize_interpolated_querystring_temp'
+assign = ast.fix_missing_locations(ast.parse(f'{temp_name} = 0'))
+
+paramaterized_query = []
+query_values = []
+
+# An f-string has two parts
+for node in values:
+    # Constants, which are just sections of static strings
+    if isinstance(node, _ast.Constant):
+        paramaterized_query.append(node.value)
+    # And FormattedValue's, that have whatever is needed to calculate the result of the interpolation
+    elif isinstance(node, _ast.FormattedValue):
+        paramaterized_query.append(placeholder)
+
+        # This may be the most cursed code I have ever written
+        assign.body[0].value = node.value # We pull off the calculation node and attach it to our dummy assignment
+        exec(compile(assign, '<string>', 'exec'), globals(), outer_locals)
+
+        query_values.append(outer_locals[temp_name])
+
+return (''.join(paramaterized_query), query_values)
+
+```
+
+Using the `ast` module I build an assignment statement to store the result of resolving the interpolation (to the `temp_name` variable). 
+
+Then we go through the f-string AST, and switch out the value in our assignment AST with the one from the query f-string, `compile` and `exec` it, then retrieve the value that was stored within our `outer_locals` dictionary.
+
+This is extremely danger.
+
+But it does work.
+
 
 ```
 >>> import interpolate
@@ -144,5 +151,7 @@ The upside though is that it does work!
 ## Conclusion
 
 SQL injection sucks, but we should probably develop our tools a bit more to make it so the frictionless path is the safe one, instead of the other way around.
+
+If you'd like to go take a look at the actual source, [it's on my GitHub](https://github.com/buckley-w-david/parameterized-interpolated-sql-queries/blob/master/interpolate.py).
 
 Please don't actually use any of this code.
