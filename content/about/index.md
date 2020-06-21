@@ -6,9 +6,9 @@ draft: false
 
 This site is built with Hugo and hosted on Github Pages, isn't that neat?
 
-If you want to contact me, please do so via [email](mailto:david@davidbuckley.ca)
+If you want to contact me, please do so via [email]( mailto: david@davidbuckley.ca )
 
-<pre>
+<!--pre>
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 
 mQENBF0KaNcBCACvlS8kV5R/BzDNdcWfDnD/+yDNws1NoHBnt7xB/0mMQjFwDp55
@@ -39,4 +39,4 @@ KgCJIyBZpTnKJZHOMoywmzpDdYXCZqNmh/BwKdNKFUvrSppOkVdO81S2HqaAT2Xl
 pNloAaHE/0LXE7vX8snfwbLPhiS47PD6x3NwYz5piG23jNepIA==
 =c7bk
 -----END PGP PUBLIC KEY BLOCK-----
-</pre>
+</pre-->

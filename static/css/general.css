@@ -1,9 +1,0 @@
-.disclaimer {
-  outline-style: solid;
-  outline-color: black;
-  outline-width: 2px;
-}
-
-.disclaimer > p {
-  color: red;
-}
