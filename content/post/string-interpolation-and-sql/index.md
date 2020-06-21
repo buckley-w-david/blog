@@ -6,9 +6,9 @@ draft: false
 
 ## Background
 
-<div class="disclaimer">
-<p>Don't use any code I provide or link to in production without giving it a serious think.</p>
-</div>
+{{< warning >}}
+Don't use any code I provide or link to in production without giving it a serious think.
+{{< /warning >}}
 
 SQL injection sucks, right? I'm not going to talk about it too much because firstly you already know, and secondly you can go somewhere else for a much better explanation.
 
@@ -92,15 +92,15 @@ This takes advantage of the `inspect` module to reach up into the callers stack 
 
 By using `ast.parse`, the string is parsed as an f-string the same way that python itself does it. `json.dumps` is used for quote escaping so that the code isn't *itself* vulnerable to an injection attack. 
 
-<div class="disclaimer">
-<p> This is the main reason you shouldn't actually do this, because while I have thought about the issue and attempted to get around it, there are no guarantees that an attacker would not be able to find a way to inject code in such a way that it's run by the python interpreter.</p>
-</div>
+{{< warning >}}
+This is the main reason you shouldn't actually do this, because while I have thought about the issue and attempted to get around it, there are no guarantees that an attacker would not be able to find a way to inject code in such a way that it's run by the python interpreter.
+{{< /warning >}}
 
 Once all that bookkeeping is done, we can move on to building the return.
 
-```
+{{< code numbered="true" >}}
 temp_name = '__parameterize_interpolated_querystring_temp'
-assign = ast.fix_missing_locations(ast.parse(f'{temp_name} = 0'))
+[[[assign = ast.fix_missing_locations(ast.parse(f'{temp_name} = 0'))]]]
 
 paramaterized_query = []
 query_values = []
@@ -108,25 +108,28 @@ query_values = []
 # An f-string has two parts
 for node in values:
     # Constants, which are just sections of static strings
-    if isinstance(node, _ast.Constant):
+    if isinstance(node, _ast.Constant): 
         paramaterized_query.append(node.value)
     # And FormattedValue's, that have whatever is needed to calculate the result of the interpolation
     elif isinstance(node, _ast.FormattedValue):
         paramaterized_query.append(placeholder)
-
         # This may be the most cursed code I have ever written
-        assign.body[0].value = node.value # We pull off the calculation node and attach it to our dummy assignment
-        exec(compile(assign, '<string>', 'exec'), globals(), outer_locals)
+        [[[assign.body[0].value = node.value]]] # We pull off the calculation node and attach it to our dummy assignment
+        [[[exec(compile(assign, '<string>', 'exec'), globals(), outer_locals)]]]
 
         query_values.append(outer_locals[temp_name])
 
 return (''.join(paramaterized_query), query_values)
 
-```
+{{< /code >}}
 
-Using the `ast` module I build an assignment statement to store the result of resolving the interpolation (to the `temp_name` variable). 
+<!--_ Stupid HTML comment with an underscore to stop my editor from thinking I have an incomplete italics marker-->
 
-Then we go through the f-string AST, and switch out the value in our assignment AST with the one from the query f-string, `compile` and `exec` it, then retrieve the value that was stored within our `outer_locals` dictionary.
+1. Build an assignment statement to store the result of resolving the interpolation (to the `temp_name` variable). 
+
+2. Switch out the value in our assignment AST with the one from the query f-string
+
+3. `compile` and `exec` it, then retrieve the value that was stored within our `outer_locals` dictionary.
 
 This is extremely danger.
 
