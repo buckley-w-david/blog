@@ -1,0 +1,6 @@
+div.resource-list {
+    display: flex;
+    flex-direction: column;
+}
+
+a.resource-item { }

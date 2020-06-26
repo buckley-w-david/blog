@@ -1,6 +1,7 @@
 ---
 title: "String Interpolation and SQL"
 date: 2020-06-19T19:52:43-04:00
+tags: ["demo"]
 draft: false
 ---
 
@@ -138,7 +139,7 @@ But it does work.
 
 ```
 >>> import interpolate
->>> f = interpolate.parameterize_interpolated_querystring_spicy
+>>> f = interpolate.parameterize_interpolated_querystring
 >>> x = 1
 >>> y = 2
 >>> z = 3
