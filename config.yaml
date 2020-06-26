@@ -9,7 +9,7 @@ params:
   customCss:
     - css/code.css # relative path starting from static/
     - css/general.css # relative path starting from static/
-  description: "I write code"
+  description: "I write code."
 
 markup:
   goldmark:
