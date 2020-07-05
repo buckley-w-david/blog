@@ -80,7 +80,7 @@ cursor.execute("SELECT * FROM users WHERE id = ?", [5])
 Most of the magic is in these lines:
 
 ```
-tree = ast.fix_missing_locations(ast.parse(f'f{json.dumps(query)}'))
+tree = ast.fix_missing_locations(ast.parse("f" + repr(query)))
 values = tree.body[0].value.values
 
 frame = inspect.currentframe()
@@ -91,10 +91,12 @@ outer_locals = outer_frame.frame.f_locals.copy()
 
 This takes advantage of the `inspect` module to reach up into the callers stack frame and retrieve their local variables. This is what allows us to later use these values as part of the call to resolve the interpolation. The `dict` of locals is copied instead of used directly so that we can add to it without polluting the parent namespace.
 
-By using `ast.parse`, the string is parsed as an f-string the same way that python itself does it. `json.dumps` is used for quote escaping so that the code isn't *itself* vulnerable to an injection attack. 
+By using `ast.parse`, the string is parsed as an f-string the same way that python itself does it. `repr` is used for quote escaping so that the code isn't *itself* vulnerable to an injection attack. 
 
 {{< warning >}}
 This is the main reason you shouldn't actually do this, because while I have thought about the issue and attempted to get around it, there are no guarantees that an attacker would not be able to find a way to inject code in such a way that it's run by the python interpreter.
+
+In this case the "atacker" is the one calling the function, not the one supplying values, since the values to interpolate are never actually substituted into the string.
 {{< /warning >}}
 
 Once all that bookkeeping is done, we can move on to building the return.
