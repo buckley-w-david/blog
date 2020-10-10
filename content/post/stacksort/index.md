@@ -2,7 +2,7 @@
 title: "StackSort"
 date: 2020-10-10T10:28:16-04:00
 tags: ["demo", "python"]
-draft: true
+draft: false
 ---
 
 {{< warning >}}
