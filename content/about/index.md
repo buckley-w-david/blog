@@ -6,7 +6,7 @@ draft: false
 
 This site is built with Hugo and hosted on Github Pages, isn't that neat?
 
-If you want to contact me, please do so via [email]( mailto: david@davidbuckley.ca )
+If you want to contact me, please do so via david@davidbuckley.ca
 
 <!--pre>
 -----BEGIN PGP PUBLIC KEY BLOCK-----
